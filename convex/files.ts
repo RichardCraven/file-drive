@@ -1,4 +1,4 @@
-import { v } from "convex/values"
+import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 
 export const createFile = mutation({
@@ -24,3 +24,17 @@ export const getFiles = query({
 export const generateUploadUrl = mutation(async (ctx) => {
     return await ctx.storage.generateUploadUrl();
 });
+
+export const deleteFile = mutation({
+    args: {fileId: v.id('files')},
+    async handler(ctx, args){
+
+        const file = await ctx.db.get(args.fileId)
+
+        if(!file){
+            throw new ConvexError('This file does not exist')
+        }
+
+        await ctx.db.delete(args.fileId)
+    }
+})
