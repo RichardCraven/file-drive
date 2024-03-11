@@ -7,7 +7,7 @@ import {
     CardHeader,
     CardTitle,
   } from "@/components/ui/card"
-import { Doc } from "@/convex/_generated/dataModel"
+import { Doc, Id } from "@/convex/_generated/dataModel"
 
 import {
     DropdownMenu,
@@ -17,7 +17,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu"
-import { MoreVertical, TrashIcon } from "lucide-react"
+import { FileTextIcon, GanttChartIcon, ImageIcon, MoreVertical, TrashIcon } from "lucide-react"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -29,13 +29,16 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
   } from "@/components/ui/alert-dialog"
-import { useState } from "react"
+import { ReactNode, useState } from "react"
 import { api } from "@/convex/_generated/api"
 import { useMutation } from "convex/react"
+import { useToast } from "@/components/ui/use-toast"
+import Image from "next/image"
 
 function FileCardActions({file}: {file: Doc<"files">}){
     const deleteFile = useMutation(api.files.deleteFile)
     const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+    const {toast} = useToast();
     return (
         <>
             <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
@@ -50,12 +53,18 @@ function FileCardActions({file}: {file: Doc<"files">}){
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => {
+                    <AlertDialogAction onClick={async () => {
                         // TODO: Actually delete
                         console.log('okay deleting for ', file._id);
-                        deleteFile({
+                        await deleteFile({
                             fileId: file._id
                         })
+
+                        toast({
+                            variant: 'default',
+                            title: "File deleted",
+                            description: "File has been deleted from the system",
+                          })
                     }}>
                         Continue
                     </AlertDialogAction>
@@ -83,23 +92,58 @@ function FileCardActions({file}: {file: Doc<"files">}){
     )
 }
 
+function getFileUrl(fileId: Id<"_storage">): string{
+    return `${process.env.NEXT_PUBLIC_CONVEX_URL}/api/storage/${fileId}`
+}
+
+import type { ImageLoaderProps } from 'next/image';
+
+// const myLoader=({src}: ImageLoaderProps)=>{
+//     return `${process.env.NEXT_PUBLIC_CONVEX_URL}/api/storage/${fileId}`;
+//   }
+
 export function FileCard({file}: {file: Doc<"files">}){
+    const typeIcons = {
+        'image': <ImageIcon/>,
+        'pdf': <FileTextIcon/>,
+        'csv' : <GanttChartIcon/>
+    } as Record<Doc<"files">["type"], ReactNode>;
+
     return (
         <Card>
             <CardHeader className="relative">
-                <CardTitle>
+                <CardTitle className="flex justify-start gap-4">
+                    <div>{typeIcons[file.type]} </div>
                     {file.name}
                 </CardTitle>
                 <div className="absolute top-2 right-2">
                     <FileCardActions file={file}/>
                 </div>
-                <CardDescription>Card Description</CardDescription>
+                {/* <CardDescription>Card Description</CardDescription> */}
             </CardHeader>
-            <CardContent>
-                <p>Card Content</p>
+            <CardContent className="text-center h-[200px] flex justify-center items-center">
+                {
+                    file.type === 'image' && 
+                    <Image
+                        // loader={getFileUrl(file.fileId)}
+                        alt={file.name}
+                        src={getFileUrl(file.fileId)}
+                        width="250" 
+                        height="150"
+                    />
+                    // <Image
+                    //     alt={file.name}
+                    //     src={file.url}
+                    //     width="100%" height="100%"
+                    // />
+                }
             </CardContent>
             <CardFooter>
-                <Button>Download</Button>
+                <Button
+                    onClick={()=>{
+                        window.open(getFileUrl(file.fileId), "_blank")
+                    }}
+                >Download</Button>
             </CardFooter>
         </Card>
     )

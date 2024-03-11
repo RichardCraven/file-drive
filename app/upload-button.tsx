@@ -21,11 +21,13 @@ import {
 } from "@/components/ui/form"
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { Doc } from "@/convex/_generated/dataModel";
 
 
 const formSchema = z.object({
   title: z.string().min(1).max(200),
-  file: z.instanceof(FileList)
+  file: z.custom<FileList>((val) => val instanceof FileList, "Required")
+  .refine((files) => files.length > 0, `Required`),
 })
 
 export default function UploadButton() {
@@ -44,21 +46,29 @@ export default function UploadButton() {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values.file)
-
+    const fileType = values.file[0].type;
     const postUrl = await generateUploadUrl();
     
     const result = await fetch(postUrl, {
       method: "POST",
-      headers: { "Content-Type": values.file[0].type },
+      headers: { "Content-Type": fileType },
       body: values.file[0],
     });
-
+    console.log('file type: ', fileType);
     const { storageId } = await result.json();
 
+    const types = {
+        'image/jpeg': 'image',
+        'image/png': 'image',
+        'application/pdf': 'pdf',
+        'text/csv' : 'csv'
+    } as Record<string, Doc<"files">["type"]>;
+    console.log('mapped file type: ', types[fileType]);
     try {
       await createFile({
         name: values.title,
-        fileId: storageId
+        fileId: storageId,
+        type: types[fileType]
       })
   
       form.reset();
