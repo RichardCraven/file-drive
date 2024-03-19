@@ -6,6 +6,7 @@ import UploadButton from "./upload-button";
 import { FileCard } from "./file-card";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
+import { SearchBar } from "./search-bar";
 
 
 export default function Home() {
@@ -14,7 +15,7 @@ export default function Home() {
 
   return (
     <main className=" mx-auto container pt-12">
-
+      <SearchBar/>
       {isLoading && <div className="flex flex-col gap-8 w-full items-center mt-24">
         <Loader2 className="h-20 w-20  text-grey-500 animate-spin"></Loader2>
         <div className="text-2xl text-gray-700">Loading...</div>

@@ -103,46 +103,46 @@ export default function UploadButton() {
     </DialogTrigger>
     <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-        <DialogTitle>Upload File</DialogTitle>
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Title</FormLabel>
-                    <FormControl>
-                        <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <FormField
-                control={form.control}
-                name="file"
-                render={() => (
-                    <FormItem>
-                    <FormLabel>File</FormLabel>
-                    <FormControl>
-                        <Input 
-                        type='file' {...fileRef}
-                        />
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <Button 
-                type="submit" 
-                disabled={form.formState.isSubmitting}
-                className="flex gap-2"
-                >
-                {form.formState.isSubmitting && <Loader2 className="h-4 w-4 animate-spin"></Loader2>}
-                Submit
-                </Button>
-            </form>
+            <DialogTitle>Upload File</DialogTitle>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                    <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Title</FormLabel>
+                        <FormControl>
+                            <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <FormField
+                    control={form.control}
+                    name="file"
+                    render={() => (
+                        <FormItem>
+                        <FormLabel>File</FormLabel>
+                        <FormControl>
+                            <Input 
+                            type='file' {...fileRef}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <Button 
+                    type="submit" 
+                    disabled={form.formState.isSubmitting}
+                    className="flex gap-2"
+                    >
+                    {form.formState.isSubmitting && <Loader2 className="h-4 w-4 animate-spin"></Loader2>}
+                    Submit
+                    </Button>
+                </form>
             </Form>
         </DialogHeader>
     </DialogContent>
